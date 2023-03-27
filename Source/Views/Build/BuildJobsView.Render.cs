@@ -177,13 +177,13 @@ partial class BuildJobsView
         if (!(rect.Width > TextlessJobWidthThreshold) || !showText) 
             return;
 
-        var opactiy = (rect.Width - TextlessJobWidthThreshold) / TextlessJobWidthThreshold;
+        var opacity = (rect.Width - TextlessJobWidthThreshold) / TextlessJobWidthThreshold;
 
-        if (opactiy <= 0) 
+        if (opacity <= 0) 
             return;
 
         Brush brush;
-        if (opactiy >= 1)
+        if (opacity >= 1)
         {
             // don't clone (to save performance)
             brush = job.UIForeground;
@@ -191,7 +191,7 @@ partial class BuildJobsView
         else
         {
             brush = job.UIForeground.Clone();
-            brush.Opacity = brush.Opacity * opactiy;
+            brush.Opacity *= opacity;
         }
 
         var textWidth = paddedWidth - JobTextMargin.Left - JobTextMargin.Right;
