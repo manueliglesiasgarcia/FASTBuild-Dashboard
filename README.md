@@ -26,6 +26,7 @@ Changes
 
 Improvements
 - add support for LimitCPUMemoryBased to settings file
+- add retry and delay for loading settings to allow worker some time to write it
 
 Fixes
 - readWriteLock is not released sometimes

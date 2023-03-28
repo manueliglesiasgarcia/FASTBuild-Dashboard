@@ -335,9 +335,9 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
             OnWorkerErrorOccurred("Failed to start worker, worker window not found");
             return;
         }
-        
-        _settings = new WorkerSettings(WorkerExecutablePath);
+
         HideWorkerVisuals();
+        _settings = new WorkerSettings(WorkerExecutablePath);
         OnWorkerStarted();
         _isStartingWorker = false;
     }

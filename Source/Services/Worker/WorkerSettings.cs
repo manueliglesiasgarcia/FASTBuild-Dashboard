@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using FastBuild.Dashboard.Configuration;
 
 namespace FastBuild.Dashboard.Services.Worker;
@@ -105,8 +106,19 @@ public class WorkerSettings
         try
         {
             _readWriteLock = true;
-        
-            if (!File.Exists(SettingsPath))
+
+            int retryCount = 3;
+            bool fileExists = false;
+            for (int i = 0; i < retryCount; i++)
+            {
+                fileExists = File.Exists(SettingsPath);
+                if (fileExists)
+                {
+                    break;
+                }
+                Thread.Sleep(200);
+            }
+            if (!fileExists)
                 return;
 
             byte[] bytesRead = File.ReadAllBytes(SettingsPath);
