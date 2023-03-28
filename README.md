@@ -18,6 +18,19 @@ __New Improvements__
 ![Screenshot of FBD 1.1.0](https://github.com/NineWorldsStudios/FASTBuild-Dashboard/blob/master/Documentations/Screenshots/FASTBuild-Dashboard.1.1.0.png?raw=true)
 
 ## Changelog 
+### 1.1.0.109
+Depends on FastBuild v1.09.003
+
+Changes
+- change broker path to "broker" instead of "main"
+
+Improvements
+- add support for LimitCPUMemoryBased to settings file
+
+Fixes
+- readWriteLock is not released sometimes
+- missing import if building in DEBUG mode
+
 ### 1.1.0.108
 Changes
 - Changed way how worker settings are applied: Instead of setting the dropdown values of the worker window, the .settings file is used instead & the worker is auto restarted when idle to apply settings. This way it should be more reliable and consistent.
