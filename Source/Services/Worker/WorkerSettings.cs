@@ -11,7 +11,7 @@ namespace FastBuild.Dashboard.Services.Worker;
 public class WorkerSettings
 {
     private const byte FbuildworkerSettingsMinVersion = 1; // Oldest compatible version
-    private const byte FbuildworkerSettingsCurrentVersion = 4; // Current version
+    private const byte FbuildworkerSettingsCurrentVersion = 5; // Current version
 
     public enum WorkerModeSetting : UInt32
     {
@@ -54,6 +54,17 @@ public class WorkerSettings
         }
     }
 
+    public bool LimitCPUMemoryBased
+    {
+        get => _limitCPUMemoryBased;
+        set
+        {
+            _limitCPUMemoryBased = value;
+            _settingsAreDirty = true;
+            Save();
+        }
+    }
+
     public bool StartMinimized => true; // We don't want to expose this setting
 
     public uint MinimumFreeMemoryMiB // Not stored in worker settings but in dashboard settings
@@ -76,6 +87,7 @@ public class WorkerSettings
     private uint _numCpUsToUse;
     private WorkerModeSetting _workerMode;
     private uint _idleThresholdPercent;
+    private bool _limitCPUMemoryBased;
 
     private bool _readWriteLock;
 
@@ -89,45 +101,51 @@ public class WorkerSettings
     {
         if (_readWriteLock)
             return;
-
-        _readWriteLock = true;
         
-        if (!File.Exists(SettingsPath))
-            return;
-
-        byte[] bytesRead = File.ReadAllBytes(SettingsPath);
-        int offset = 0;
-
-        // Header
-        byte settingsVersion = bytesRead[3];
-        if (settingsVersion < FbuildworkerSettingsMinVersion ||
-            settingsVersion > FbuildworkerSettingsCurrentVersion)
+        try
         {
-            return; // Too old or new
-        }
+            _readWriteLock = true;
+        
+            if (!File.Exists(SettingsPath))
+                return;
 
-        offset += 4;
+            byte[] bytesRead = File.ReadAllBytes(SettingsPath);
+            int offset = 0;
 
-        // Settings
-        WorkerMode = (WorkerModeSetting)BitConverter.ToUInt32(bytesRead, offset);
-        offset += sizeof(UInt32);
+            // Header
+            byte settingsVersion = bytesRead[3];
+            if (settingsVersion < FbuildworkerSettingsMinVersion ||
+                settingsVersion > FbuildworkerSettingsCurrentVersion)
+            {
+                return; // Version not supported: too old or new
+            }
 
-        if (settingsVersion >= 4)
-        {
+            offset += 4;
+
+            // Settings
+            WorkerMode = (WorkerModeSetting)BitConverter.ToUInt32(bytesRead, offset);
+            offset += sizeof(UInt32);
+
             IdleThresholdPercent = BitConverter.ToUInt32(bytesRead, offset);
             offset += sizeof(UInt32);
+
+            NumCPUsToUse = BitConverter.ToUInt32(bytesRead, offset);
+            offset += sizeof(UInt32);
+
+            // skip reading since we always want this to be true
+            // StartMinimized = BitConverter.ToBoolean(bytesRead, offset);
+            offset += sizeof(bool);
+            
+            LimitCPUMemoryBased = BitConverter.ToBoolean(bytesRead, offset);
+            offset += sizeof(bool);
+
+            // Reset dirty flag as it was just freshly loaded
+            _settingsAreDirty = false;
         }
-
-        NumCPUsToUse = BitConverter.ToUInt32(bytesRead, offset);
-        offset += sizeof(UInt32);
-
-        //StartMinimized = BitConverter.ToBoolean(bytesRead, offset);
-        offset += sizeof(bool);
-
-        // Reset dirty flag as it was just freshly laoded
-        _settingsAreDirty = false;
-
-        _readWriteLock = false;
+        finally
+        {
+            _readWriteLock = false;
+        }
     }
 
     public void Save()
@@ -149,6 +167,7 @@ public class WorkerSettings
         bytes.AddRange(BitConverter.GetBytes(IdleThresholdPercent));
         bytes.AddRange(BitConverter.GetBytes(NumCPUsToUse));
         bytes.AddRange(BitConverter.GetBytes(StartMinimized));
+        bytes.AddRange(BitConverter.GetBytes(LimitCPUMemoryBased));
 
         File.WriteAllBytes(SettingsPath, bytes.ToArray());
         _readWriteLock = false;
