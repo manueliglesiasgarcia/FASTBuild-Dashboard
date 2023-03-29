@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using FastBuild.Dashboard.Configuration;
+using NLog;
 
 namespace FastBuild.Dashboard.Services.Worker;
 
@@ -11,6 +12,8 @@ namespace FastBuild.Dashboard.Services.Worker;
 /// </summary>
 public class WorkerSettings
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
     private const byte FbuildworkerSettingsMinVersion = 1; // Oldest compatible version
     private const byte FbuildworkerSettingsCurrentVersion = 5; // Current version
 
@@ -116,10 +119,20 @@ public class WorkerSettings
                 {
                     break;
                 }
-                Thread.Sleep(200);
+                if (i != retryCount - 1) 
+                {
+                    Logger.Warn($"Unable to find settings at {SettingsPath}! Retrying");
+                    Thread.Sleep(200);
+                }
             }
+
             if (!fileExists)
+            {
+                Logger.Warn($"Unable to find settings at {SettingsPath}!");
                 return;
+            }
+            
+            Logger.Info("Loading worker settings...");
 
             byte[] bytesRead = File.ReadAllBytes(SettingsPath);
             int offset = 0;
@@ -129,6 +142,7 @@ public class WorkerSettings
             if (settingsVersion < FbuildworkerSettingsMinVersion ||
                 settingsVersion > FbuildworkerSettingsCurrentVersion)
             {
+                Logger.Warn($"Unable to load worker settings version {settingsVersion}. Will create new defaults!");
                 return; // Version not supported: too old or new
             }
 
@@ -164,6 +178,8 @@ public class WorkerSettings
     {
         if (_readWriteLock)
             return;
+        
+        Logger.Info($"Saving worker settings to {SettingsPath}...");
 
         _readWriteLock = true;
         List<byte> bytes = new List<byte>();

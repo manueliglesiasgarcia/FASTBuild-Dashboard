@@ -11,12 +11,17 @@ using System.Threading.Tasks;
 using System.Windows;
 using FastBuild.Dashboard.Configuration;
 using FastBuild.Dashboard.Services.RemoteWorker;
+using NLog;
+using NLog.Fluent;
 
 namespace FastBuild.Dashboard.Services.Worker;
 
 internal partial class ExternalWorkerAgent : IWorkerAgent
 {
-    private const string WorkerExecutablePath = @"FBuild\FBuildWorker.exe";
+    private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
+    private readonly string _workerExecutablePath = 
+        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "FBuild", "FBuildWorker.exe");
 
     private bool _hasAppExited;
 
@@ -28,12 +33,13 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
     public ExternalWorkerAgent()
     {
         Application.Current.Exit += Application_Exit;
-        _settings = new WorkerSettings(WorkerExecutablePath);
+        _settings = new WorkerSettings(_workerExecutablePath);
+        Logger.Info("Created");
     }
 
     public bool IsRunning => !_isStartingWorker && _workerProcess != null && !_workerProcess.HasExited;
 
-    private bool _initialized;
+    private bool _initialized = false;
     private bool _isStartingWorker = true;
     private bool _workerHidden = false;
 
@@ -42,16 +48,28 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
     public void Initialize()
     {
         if (_initialized)
+        {
+            Logger.Warn("Unable to initialize worker as it is already initialized!");
             return;
-            
+        }
+
         if (IsRunning)
+        {
+            Logger.Warn("Unable to initialize worker as it is already running!");
             return;
-        
+        }
+            
+
+        Logger.Info("Initializing external worker");
         if (FindExistingWorker())
+        {
+            Logger.Info("Killing external worker process");
             _workerProcess.Kill(); // Could be any instance but we want to make sure its spawned by us
-        
+        }
+
         StartNewWorker();
-        
+
+        Logger.Info("Starting worker watchdog");
         Task.Factory.StartNew(WorkerWatchdog);
         _initialized = true;
     }
@@ -203,12 +221,24 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
 
     public void RestartWorker()
     {
+        Logger.Info("Restarting worker...");
+
         _workerProcess?.Kill();
         OnWorkerErrorOccurred("Worker restarting");
-        
+
         if (FindExistingWorker())
-            _workerProcess?.Kill(); // Could be any instance but we want to make sure its spawned by us
-        
+        {
+            Logger.Info("Killing existing worker process.");
+            try
+            {
+                _workerProcess?.Kill(); // Could be any instance but we want to make sure its spawned by us
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+
         _workerProcess = null;
         StartNewWorker();
     }
@@ -247,7 +277,7 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
             {
                 if (!_workerHidden)
                     HideWorkerVisuals(); // Worker might need a moment to start, so window handle is not accessible directly
-                
+
                 CheckForRestartToReloadSettings();
             }
 
@@ -266,17 +296,20 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
         var anyWorking = GetStatus().Any(c => c.State == WorkerCoreState.Working);
         if (anyWorking)
             return;
-
+        
+        Logger.Info("Restartng worker due to settings update");
         RestartWorker();
     }
 
     private void OnWorkerStarted()
     {
+        Logger.Info("Worker Started");
         WorkerRunStateChanged?.Invoke(this, new WorkerRunStateChangedEventArgs(true, null));
     }
 
     private void OnWorkerErrorOccurred(string message)
     {
+        Logger.Error($"Worker Error: {message}");
         _isStartingWorker = false;
         WorkerRunStateChanged?.Invoke(this, new WorkerRunStateChangedEventArgs(false, message));
     }
@@ -294,20 +327,23 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
         _workerProcess = processes[0];
         return true;
     }
+
     private void StartNewWorker()
     {
+        Logger.Info("Trying to start new worker");
+
         _isStartingWorker = true;
-        var executablePath = WorkerExecutablePath;
+        var executablePath = _workerExecutablePath;
 
         if (!File.Exists(executablePath))
         {
             // If worker isn't found in working directory, try it relative to running binary.
             executablePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                WorkerExecutablePath);
+                _workerExecutablePath);
 
             if (!File.Exists(executablePath))
             {
-                OnWorkerErrorOccurred($"Worker executable not found at {WorkerExecutablePath}");
+                OnWorkerErrorOccurred($"Worker executable not found at {_workerExecutablePath}");
                 return;
             }
         }
@@ -320,7 +356,7 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
 
         try
         {
-            _workerProcess = new Process{StartInfo = startInfo, EnableRaisingEvents = true};
+            _workerProcess = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
             _workerProcess.Exited += WorkerProcessOnExited;
             _workerProcess.Start();
             _workerHidden = false;
@@ -338,7 +374,7 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
         }
 
         HideWorkerVisuals();
-        _settings = new WorkerSettings(WorkerExecutablePath);
+        _settings = new WorkerSettings(_workerExecutablePath);
         OnWorkerStarted();
         _isStartingWorker = false;
     }
@@ -347,7 +383,7 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
     {
         if (_workerProcess != null)
             _workerProcess.Exited -= WorkerProcessOnExited;
-        
+
         _workerProcess = null;
     }
 }
