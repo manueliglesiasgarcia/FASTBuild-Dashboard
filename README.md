@@ -21,6 +21,11 @@ __New Improvements__
 ![Screenshot of FBD 1.1.0](https://github.com/NineWorldsStudios/FASTBuild-Dashboard/blob/master/Documentations/Screenshots/FASTBuild-Dashboard.1.1.0.png?raw=true)
 
 ## Changelog
+### 1.1.3.110
+#### Aesir changes
+Changes
+- change default of SpawnShadowExecutable from true to false
+
 ### 1.1.2.110
 #### Aesir changes
 Depends on FastBuild v1.09.003
