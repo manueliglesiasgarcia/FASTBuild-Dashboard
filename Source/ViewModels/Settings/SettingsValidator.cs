@@ -15,6 +15,14 @@ public class SettingsValidator
         return ValidationResult.Success;
     }
 
+    public static ValidationResult ValidateCoordinatorAddress(string coordinatorAddress, ValidationContext context)
+    {
+        if (string.IsNullOrEmpty(coordinatorAddress))
+            return new ValidationResult("Coordinator address is empty", new[] { nameof(SettingsViewModel.CoordinatorAddress) });
+
+        return ValidationResult.Success;
+    }
+
     public static ValidationResult ValidateExternalSourceEditorPath(string editorPath, ValidationContext context)
     {
         if (!string.IsNullOrEmpty(editorPath))

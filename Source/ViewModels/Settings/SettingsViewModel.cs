@@ -53,6 +53,17 @@ internal sealed partial class SettingsViewModel : ValidatingScreen<SettingsViewM
         }
     }
 
+    [CustomValidation(typeof(SettingsValidator), "ValidateCoordinatorAddress")]
+    public string CoordinatorAddress
+    {
+        get => IoC.Get<IBrokerageService>().CoordinatorAddress;
+        set
+        {
+            IoC.Get<IBrokerageService>().CoordinatorAddress = value;
+            NotifyOfPropertyChange();
+        }
+    }
+
     public string DisplayWorkersInPool
     {
         get
