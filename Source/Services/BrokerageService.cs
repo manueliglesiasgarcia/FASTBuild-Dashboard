@@ -101,7 +101,7 @@ internal class BrokerageService : IBrokerageService
                     // char m_Padding1 = 0
                     // uint32_t m_ProtocolVersion = 22
                     // uint8_t m_Platform = Env::Platform = 0
-                    // bool m_RequestWorkerInfo = 1
+                    // bool m_ShouldGetAllInfo = 1
                     byte[] message = new byte[16];
                     message[0] = (byte)(message.Length - 4);
                     message[4] = 12;
@@ -146,6 +146,7 @@ internal class BrokerageService : IBrokerageService
             {
                 remoteWorkers = new HashSet<IRemoteWorkerAgent>();
                 WorkerNames = new string[0];
+                return;
             }
 
             try
