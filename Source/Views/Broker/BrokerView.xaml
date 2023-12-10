@@ -17,7 +17,7 @@
                 <Grid TextElement.Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
                       VerticalAlignment="Center">
 
-                    <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}"
+                    <TextBlock Style="{DynamicResource MaterialDesignHeadline6TextBlock}"
                                VerticalAlignment="Center"
                                Text="Broker agents" />
                 </Grid>

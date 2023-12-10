@@ -18,7 +18,7 @@
                                       Padding="8">
                 <StackPanel>
                     <TextBlock Text="{Binding DisplayName}"
-                               Style="{DynamicResource MaterialDesignTitleTextBlock}" />
+                               Style="{DynamicResource MaterialDesignHeadline6TextBlock}" />
                     <TextBlock Text="{Binding DisplayStatus}"
                                Style="{DynamicResource MaterialDesignSubheadingTextBlock}"
                                Margin="0,4,0,0" />

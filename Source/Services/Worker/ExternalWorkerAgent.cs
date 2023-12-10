@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using FastBuild.Dashboard.Configuration;
 using FastBuild.Dashboard.Services.RemoteWorker;
+using Caliburn.Micro;
 using NLog;
 using NLog.Fluent;
 
@@ -352,7 +353,21 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
         {
             Arguments = "-nosubprocess"
         };
-        startInfo.Arguments += $" -minfreememory={AppSettings.Default.WorkerMinFreeMemoryMiB}";
+        var ModeInt = IoC.Get<IWorkerAgentService>().WorkerMode;
+        var ModeVal = "";
+        if (ModeInt == WorkerSettings.WorkerModeSetting.WorkProportional){
+            ModeVal = "proportional";
+        }
+        else if (ModeInt == WorkerSettings.WorkerModeSetting.WorkAlways){
+            ModeVal = "dedicated";
+        }
+        else if (ModeInt == WorkerSettings.WorkerModeSetting.WorkWhenIdle){
+            ModeVal = "idle";
+        }
+        else{
+            ModeVal = "disabled";
+        }
+        startInfo.Arguments += $" -cpus={IoC.Get<IWorkerAgentService>().WorkerCores} -mode={ModeVal} -minfreememory={AppSettings.Default.WorkerMinFreeMemoryMiB}";
 
         try
         {

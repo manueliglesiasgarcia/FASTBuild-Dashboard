@@ -17,7 +17,7 @@ public class WorkerListChangedEventArgs : EventArgs
 
 internal class BrokerageService : IBrokerageService
 {
-    private const string WorkerPoolRelativePath = @"broker\22.windows";
+    private const string WorkerPoolRelativePath = @"main\22.windows";
 
     private bool _isUpdatingWorkers;
 
@@ -48,14 +48,14 @@ internal class BrokerageService : IBrokerageService
 
     public string BrokeragePath
     {
-        get => Environment.GetEnvironmentVariable("FASTBUILD_BROKERAGE_PATH");
-        set => Environment.SetEnvironmentVariable("FASTBUILD_BROKERAGE_PATH", value);
+        get => Environment.GetEnvironmentVariable("FASTBUILD_BROKERAGE_PATH", EnvironmentVariableTarget.User);
+        set => Environment.SetEnvironmentVariable("FASTBUILD_BROKERAGE_PATH", value, EnvironmentVariableTarget.User);
     }
 
     public string CoordinatorAddress
     {
-        get => Environment.GetEnvironmentVariable("FASTBUILD_COORDINATOR");
-        set => Environment.SetEnvironmentVariable("FASTBUILD_COORDINATOR", value);
+        get => Environment.GetEnvironmentVariable("FASTBUILD_COORDINATOR", EnvironmentVariableTarget.User);
+        set => Environment.SetEnvironmentVariable("FASTBUILD_COORDINATOR", value, EnvironmentVariableTarget.User);
     }
 
     public event EventHandler WorkerCountChanged;

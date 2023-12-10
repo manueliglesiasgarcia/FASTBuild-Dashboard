@@ -65,11 +65,6 @@ internal class AppBootstrapper : BootstrapperBase
         var assemblyLocation = Assembly.GetEntryAssembly()?.Location;
 
         var identifier = assemblyLocation?.Replace('\\', '_');
-        if (!SingleInstance<App>.InitializeAsFirstInstance(identifier))
-        {
-            Logger.Warn($"Exiting as this is not the first instance!");
-            Environment.Exit(0);
-        }
 
         if (App.Current.DoNotSpawnShadowExecutable || App.Current.IsShadowProcess)
         {
@@ -148,7 +143,6 @@ internal class AppBootstrapper : BootstrapperBase
         }
 
         CreateShadowContext(shadowAssemblyPath);
-        SingleInstance<App>.Cleanup();
 
         Logger.Info($"Starting shadow process");
         Process.Start(new ProcessStartInfo
@@ -165,7 +159,6 @@ internal class AppBootstrapper : BootstrapperBase
     protected override void OnExit(object sender, EventArgs e)
     {
         Logger.Info("Exiting...");
-        SingleInstance<App>.Cleanup();
         base.OnExit(sender, e);
     }
 }
