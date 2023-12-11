@@ -28,13 +28,13 @@
                 <Border Background="{DynamicResource MaterialDesignPaper}" Visibility="{Binding IsWorkerRunning, Converter={support:BoolToVisibilityConverter TrueValue=Hidden, FalseValue=Visible}}">
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="The worker is not running due to an error occurred"
-                                   Style="{DynamicResource MaterialDesignHeadline6TextBlock}"
+                                   Style="{DynamicResource MaterialDesignTitleTextBlock}"
                                    Foreground="{StaticResource JobBorderBrush_Error}"
                                    FontSize="16"
                                    HorizontalAlignment="Center" />
                         <TextBlock Margin="0,16,0,0"
                                    Text="{Binding WorkerErrorMessage}"
-                                   Style="{DynamicResource MaterialDesignHeadline6TextBlock}"
+                                   Style="{DynamicResource MaterialDesignTitleTextBlock}"
                                    Foreground="{StaticResource JobBorderBrush_Error}"
                                    FontSize="16"
                                    HorizontalAlignment="Center" />

@@ -66,7 +66,7 @@
                                              VerticalAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Style="{DynamicResource MaterialDesignHeadline6TextBlock}"
+                <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}"
                            VerticalAlignment="Center"
                            Text="{Binding ActiveItem.StatusText, Mode=OneWay}" />
 

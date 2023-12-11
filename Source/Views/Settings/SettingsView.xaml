@@ -89,7 +89,7 @@
                 <Grid TextElement.Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
                       VerticalAlignment="Center">
 
-                    <TextBlock Style="{DynamicResource MaterialDesignHeadline6TextBlock}"
+                    <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}"
                                VerticalAlignment="Center"
                                Text="Settings" />
                 </Grid>

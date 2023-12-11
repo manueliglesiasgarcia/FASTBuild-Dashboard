@@ -23,7 +23,7 @@
                          StrokeThickness="1"
                          Stroke="{Binding UIBulbBorderColor}" />
                 <TextBlock x:Name="CoreId"
-                           Style="{DynamicResource MaterialDesignHeadline6TextBlock}"
+                           Style="{DynamicResource MaterialDesignTitleTextBlock}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            Foreground="{Binding UIBulbForeground}"
@@ -33,7 +33,7 @@
             <Grid Margin="48,0,0,0">
                 <TextBlock x:Name="DisplayState"
                            Visibility="{Binding IsWorking, Converter={support:BoolToVisibilityConverter TrueValue=Hidden, FalseValue=Visible}}"
-                           Style="{DynamicResource MaterialDesignHeadline6TextBlock}"
+                           Style="{DynamicResource MaterialDesignTitleTextBlock}"
                            Foreground="{Binding UIBulbForeground}"
                            Text="Working"
                            VerticalAlignment="Center" />

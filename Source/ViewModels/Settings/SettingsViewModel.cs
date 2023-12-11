@@ -45,10 +45,10 @@ internal sealed partial class SettingsViewModel : ValidatingScreen<SettingsViewM
     [CustomValidation(typeof(SettingsValidator), "ValidateFolderPath")]
     public string CachePath
     {
-        get => Environment.GetEnvironmentVariable("FASTBUILD_CACHE_PATH", EnvironmentVariableTarget.User);
+        get => Environment.GetEnvironmentVariable("FASTBUILD_CACHE_PATH");
         set
         {
-            Environment.SetEnvironmentVariable("FASTBUILD_CACHE_PATH", value, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("FASTBUILD_CACHE_PATH", value);
             NotifyOfPropertyChange();
         }
     }
