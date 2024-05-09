@@ -276,7 +276,6 @@
                     <TextBlock Style="{StaticResource SectionTitle}"
                                Text="Dashboard" />
 
-                    <!--
                     <StackPanel Style="{StaticResource OptionContainer}">
                         <TextBlock Style="{StaticResource OptionTitle}"
                                    Text="Start with Windows" />
@@ -286,7 +285,6 @@
                                           HorizontalAlignment="Left"/>
                         </Grid>
                     </StackPanel>
-                    -->
 
                     <StackPanel Style="{StaticResource OptionContainer}">
                         <TextBlock Style="{StaticResource OptionTitle}"

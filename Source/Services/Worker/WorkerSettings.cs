@@ -162,7 +162,7 @@ public class WorkerSettings
             // StartMinimized = BitConverter.ToBoolean(bytesRead, offset);
             offset += sizeof(bool);
             
-            LimitCPUMemoryBased = BitConverter.ToBoolean(bytesRead, offset);
+            LimitCPUMemoryBased = false;
             offset += sizeof(bool);
 
             // Reset dirty flag as it was just freshly loaded

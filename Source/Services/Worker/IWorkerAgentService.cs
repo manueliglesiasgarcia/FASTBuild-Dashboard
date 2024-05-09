@@ -7,7 +7,7 @@ internal interface IWorkerAgentService
 {
     uint WorkerCores { get; set; }
     uint WorkerThreshold { get; set; }
-    WorkerSettings.WorkerModeSetting WorkerMode { get; set; }
+    WorkerSettings.WorkerModeSetting WorkerMode { get; set; } 
     uint MinFreeMemoryMiB { get; set; }
     bool IsRunning { get; }
     bool IsPendingRestart { get; }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Media;
 using Caliburn.Micro;
 using Caliburn.Micro.Validation;
+using FastBuild.Dashboard.Configuration;
 using FastBuild.Dashboard.Services;
 using FastBuild.Dashboard.Services.Worker;
 using Ookii.Dialogs.Wpf;
@@ -136,6 +137,19 @@ internal sealed partial class SettingsViewModel : ValidatingScreen<SettingsViewM
     }
 
     public string DisplayCores => WorkerCores == 1 ? "1 core" : $"up to {WorkerCores} cores";
+
+
+    public bool StartWithWindows
+    {
+        get => AppSettings.Default.StartWithWindows;
+        set
+        {
+            AppSettings.Default.StartWithWindows = value;
+            AppSettings.Default.Save();
+            App.Current.SetStartupWithWindows(value);
+            this.NotifyOfPropertyChange();
+        }
+    }
 
     public uint WorkerMinFreeMemoryMiB
     {

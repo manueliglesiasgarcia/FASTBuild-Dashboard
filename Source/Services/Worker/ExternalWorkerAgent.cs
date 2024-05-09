@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -341,10 +342,17 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
             // If worker isn't found in working directory, try it relative to running binary.
             executablePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 _workerExecutablePath);
+            var executableDir = Path.GetDirectoryName(executablePath);
 
             if (!File.Exists(executablePath))
             {
                 OnWorkerErrorOccurred($"Worker executable not found at {_workerExecutablePath}");
+                Directory.CreateDirectory(executableDir);
+                
+                WebClient client = new WebClient();
+
+                client.DownloadFile(new Uri("https://www.fastbuild.org/downloads/v1.13/FASTBuild-Windows-x64-v1.13.zip"), executableDir + "FASTBuild-Windows-x64-v1.13.zip");
+                System.IO.Compression.ZipFile.ExtractToDirectory(executableDir + "FASTBuild-Windows-x64-v1.13.zip", executableDir);
                 return;
             }
         }
@@ -355,17 +363,17 @@ internal partial class ExternalWorkerAgent : IWorkerAgent
         };
         var ModeInt = IoC.Get<IWorkerAgentService>().WorkerMode;
         var ModeVal = "";
-        if (ModeInt == WorkerSettings.WorkerModeSetting.WorkProportional){
-            ModeVal = "proportional";
+        if (ModeInt == WorkerSettings.WorkerModeSetting.WorkWhenIdle){
+            ModeVal = "idle";
         }
         else if (ModeInt == WorkerSettings.WorkerModeSetting.WorkAlways){
             ModeVal = "dedicated";
         }
-        else if (ModeInt == WorkerSettings.WorkerModeSetting.WorkWhenIdle){
-            ModeVal = "idle";
+        else if (ModeInt == WorkerSettings.WorkerModeSetting.Disabled){
+            ModeVal = "disabled";
         }
         else{
-            ModeVal = "disabled";
+            ModeVal = "proportional";
         }
         startInfo.Arguments += $" -cpus={IoC.Get<IWorkerAgentService>().WorkerCores} -mode={ModeVal} -minfreememory={AppSettings.Default.WorkerMinFreeMemoryMiB}";
 
