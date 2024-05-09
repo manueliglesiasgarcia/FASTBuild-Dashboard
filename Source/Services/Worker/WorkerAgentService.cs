@@ -17,7 +17,16 @@ internal class WorkerAgentService : IWorkerAgentService
 
     public uint WorkerCores
     {
-        get => _workerAgent.GetSettings().NumCPUsToUse;
+        get {
+            uint cpus = Convert.ToUInt32(Environment.ProcessorCount);
+            uint cpustouse = _workerAgent.GetSettings().NumCPUsToUse;
+            if (_workerAgent.GetSettings().NumCPUsToUse == 0) {
+                return cpus;
+            }
+            else {
+                return cpustouse;
+            }
+        } 
         set
         {
             value = Math.Min(value, (uint)Environment.ProcessorCount);
