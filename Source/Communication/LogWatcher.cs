@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace FastBuild.Dashboard.Communication;
 
 internal class LogWatcher
 {
+    private const string LogUnrealBuildTool = @"UnrealBuildTool";
     private const string LogRelativePath = @"FASTBuild\FastBuildLog.log";
 
     private readonly string _logPath;
@@ -25,8 +27,17 @@ internal class LogWatcher
 #else
         var path = Path.GetTempPath();
         var fastbuildTempPath = Environment.GetEnvironmentVariable("FASTBUILD_TEMP_PATH");
-        if (fastbuildTempPath != null && Directory.Exists(fastbuildTempPath)) path = fastbuildTempPath;
-
+        var unrealBuildToolTempPath = Path.Combine(path, LogUnrealBuildTool);
+        if (fastbuildTempPath != null && Directory.Exists(fastbuildTempPath)) {
+            path = fastbuildTempPath;
+        }
+        if (Directory.Exists(unrealBuildToolTempPath))
+        {
+            var directory = new DirectoryInfo(unrealBuildToolTempPath );
+            var unrealBuildToolLastDirectory = directory.GetDirectories().OrderByDescending(f => f.LastWriteTime).First().FullName;
+            path = unrealBuildToolLastDirectory;
+            
+        } 
         _logPath = Path.Combine(path, LogRelativePath);
 #endif
     }
