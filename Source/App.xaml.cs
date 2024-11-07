@@ -22,7 +22,7 @@ public partial class App : ISingleInstanceApp
 #if DEBUG
     public static bool IsInDesignTime { get; } = DesignerProperties.GetIsInDesignMode(new DependencyObject());
 #endif
-    public bool StartMinimized { get; private set; }
+    public bool StartMinimized { get; private set; } = true;
     public bool DoNotSpawnShadowExecutable { get; private set; }
     public bool IsShadowProcess { get; private set; }
     public ShadowContext ShadowContext { get; private set; }
@@ -85,7 +85,6 @@ public partial class App : ISingleInstanceApp
 			}
 #endif
 
-        StartMinimized = args.Contains(AppArguments.StartMinimized);
         DoNotSpawnShadowExecutable = !args.Contains(AppArguments.Shadow);
         if (IsShadowProcess) 
             LoadShadowContext();
