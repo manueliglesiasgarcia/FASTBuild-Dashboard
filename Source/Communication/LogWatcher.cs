@@ -37,7 +37,7 @@ internal class LogWatcher
             DateTime thisDay = DateTime.Today;
             var unrealBuildToolLastDirectory = directory.GetDirectories().OrderByDescending(f => f.LastWriteTime).First().FullName;
             var FastBuildLogExist = File.Exists(Path.Combine(unrealBuildToolLastDirectory, LogRelativePath));
-            if(directory.LastWriteTime.DayOfYear == thisDay.DayOfYear && directory.LastWriteTime.Year == thisDay.Year && FastBuildLogExist){
+            if(FastBuildLogExist){
                 path = unrealBuildToolLastDirectory;
             }
             
